@@ -55,30 +55,30 @@ func (client *Client) ListChallenges() ([]Challenge, error) {
 	return chalResp.Data, nil
 }
 
-func (client *Client) CreateChallenge(chal Challenge) (uint, error) {
+func (client *Client) CreateChallenge(chal Challenge) (*Challenge, error) {
 	buff := new(bytes.Buffer)
 	enc := json.NewEncoder(buff)
 	enc.Encode(chal)
 
 	req, err := http.NewRequest("POST", client.api("challenges"), buff)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	req.Header["CSRF-Token"] = []string{client.nonce}
 	req.Header["Content-Type"] = []string{"application/json"}
 
 	resp, err := client.cl.Do(req)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	chalResp := new(challengeResponse)
 	json.NewDecoder(resp.Body).Decode(chalResp)
 	resp.Body.Close()
 	if !chalResp.Success {
-		return 0, fmt.Errorf("could not create challenge (%s)", chalResp.Message)
+		return nil, fmt.Errorf("could not create challenge (%s)", chalResp.Message)
 	}
 
-	return chalResp.Data.ID, nil
+	return &chalResp.Data, nil
 }
 
 func (client *Client) GetChallenge(chal uint) (*Challenge, error) {
@@ -93,6 +93,33 @@ func (client *Client) GetChallenge(chal uint) (*Challenge, error) {
 	resp.Body.Close()
 	if !chalResp.Success {
 		return nil, fmt.Errorf("could not list challenges (%s)", chalResp.Message)
+	}
+
+	return &chalResp.Data, nil
+}
+
+func (client *Client) ModifyChallenge(chal Challenge) (*Challenge, error) {
+	buff := new(bytes.Buffer)
+	enc := json.NewEncoder(buff)
+	enc.Encode(chal)
+
+	url := client.api(fmt.Sprintf("challenges/%d", chal.ID))
+	req, err := http.NewRequest("PATCH", url, buff)
+	if err != nil {
+		return nil, err
+	}
+	req.Header["CSRF-Token"] = []string{client.nonce}
+	req.Header["Content-Type"] = []string{"application/json"}
+
+	resp, err := client.cl.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	chalResp := new(challengeResponse)
+	json.NewDecoder(resp.Body).Decode(chalResp)
+	resp.Body.Close()
+	if !chalResp.Success {
+		return nil, fmt.Errorf("could not modify challenge (%s)", chalResp.Message)
 	}
 
 	return &chalResp.Data, nil

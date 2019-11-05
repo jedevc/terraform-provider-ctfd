@@ -11,7 +11,7 @@ func resourceCTFdChallenge() *schema.Resource {
 	return &schema.Resource{
 		Create:   resourceCTFdChallengeCreate,
 		Read:     resourceCTFdChallengeRead,
-		Update:   nil,
+		Update:   resourceCTFdChallengeUpdate,
 		Delete:   resourceCTFdChallengeDelete,
 		Importer: nil,
 
@@ -23,34 +23,28 @@ func resourceCTFdChallenge() *schema.Resource {
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"category": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"points": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
-				ForceNew: true,
 			},
 			"hidden": &schema.Schema{
 				Type:     schema.TypeBool,
 				Default:  false,
 				Optional: true,
-				ForceNew: true,
 			},
 			"max_attempts": &schema.Schema{
 				Type:     schema.TypeInt,
 				Default:  0,
 				Optional: true,
-				ForceNew: true,
 			},
 			// "file": &schema.Schema{
 			// 	Type:     schema.TypeSet,
@@ -133,13 +127,13 @@ func resourceCTFdChallengeCreate(d *schema.ResourceData, meta interface{}) error
 		State:       state,
 		MaxAttempts: uint(d.Get("max_attempts").(int)),
 	}
-	challengeID, err := client.CreateChallenge(chal)
+	challenge, err := client.CreateChallenge(chal)
 	if err != nil {
 		return err
 	}
 
-	d.Set("challenge_id", challengeID)
-	d.SetId(strconv.FormatUint(uint64(challengeID), 10))
+	d.Set("challenge_id", challenge.ID)
+	d.SetId(strconv.FormatUint(uint64(challenge.ID), 10))
 	return nil
 }
 
@@ -161,6 +155,31 @@ func resourceCTFdChallengeRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("max_attempts", chal.MaxAttempts)
 
 	return nil
+}
+
+func resourceCTFdChallengeUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*TerraformCTFdContext).client
+	// config := meta.(*TerraformCTFdContext).config
+
+	var state string
+	if d.Get("hidden").(bool) {
+		state = "hidden"
+	} else {
+		state = "visible"
+	}
+
+	chal := api.Challenge{
+		ID:          uint(d.Get("challenge_id").(int)),
+		Type:        "standard",
+		Name:        d.Get("name").(string),
+		Category:    d.Get("category").(string),
+		Description: d.Get("description").(string),
+		Value:       d.Get("points").(int),
+		State:       state,
+		MaxAttempts: uint(d.Get("max_attempts").(int)),
+	}
+	_, err := client.ModifyChallenge(chal)
+	return err
 }
 
 func resourceCTFdChallengeDelete(d *schema.ResourceData, meta interface{}) error {
