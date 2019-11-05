@@ -132,6 +132,23 @@ func (client *Client) CreateChallenge(chal Challenge) (uint, error) {
 	return chalResp.Data.ID, nil
 }
 
+func (client *Client) GetChallenge(chal uint) (*Challenge, error) {
+	url := client.api(fmt.Sprintf("challenges/%d", chal))
+	resp, err := client.cl.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	chalResp := new(challengeResponse)
+	json.NewDecoder(resp.Body).Decode(chalResp)
+	resp.Body.Close()
+	if !chalResp.Success {
+		return nil, fmt.Errorf("could not list challenges (%s)", chalResp.Message)
+	}
+
+	return &chalResp.Data, nil
+}
+
 func (client *Client) DeleteChallenge(chal uint) error {
 	url := client.api(fmt.Sprintf("challenges/%d", chal))
 	req, err := http.NewRequest("DELETE", url, nil)

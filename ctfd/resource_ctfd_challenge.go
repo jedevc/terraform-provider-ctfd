@@ -143,6 +143,22 @@ func resourceCTFdChallengeCreate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceCTFdChallengeRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*TerraformCTFdContext).client
+	// config := meta.(*TerraformCTFdContext).config
+
+	challengeID := uint(d.Get("challenge_id").(int))
+	chal, err := client.GetChallenge(challengeID)
+	if err != nil {
+		return err
+	}
+
+	d.Set("name", chal.Name)
+	d.Set("category", chal.Category)
+	d.Set("description", chal.Description)
+	d.Set("points", chal.Value)
+	d.Set("hidden", chal.State == "hidden")
+	d.Set("max_attempts", chal.MaxAttempts)
+
 	return nil
 }
 
