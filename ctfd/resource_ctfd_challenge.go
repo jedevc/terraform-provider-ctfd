@@ -32,7 +32,7 @@ func resourceCTFdChallenge() *schema.Resource {
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
+				Required: true,
 				ForceNew: true,
 			},
 			"points": &schema.Schema{

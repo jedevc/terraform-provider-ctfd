@@ -137,8 +137,8 @@ type Challenge struct {
 	Category    string `json:"category"`
 	Description string `json:"description"`
 	Value       int    `json:"value"`
-	State       string `json:"state"`
-	MaxAttempts uint   `json:"max_attempts"`
+	State       string `json:"state,omitempty"`
+	MaxAttempts uint   `json:"max_attempts,omitempty"`
 }
 
 type challengesResponse struct {
