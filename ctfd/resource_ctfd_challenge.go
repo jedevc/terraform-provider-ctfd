@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/jedevc/terraform-provider-ctfd/api"
 )
 
 func resourceCTFdChallenge() *schema.Resource {
@@ -123,7 +124,7 @@ func resourceCTFdChallengeCreate(d *schema.ResourceData, meta interface{}) error
 		state = "visible"
 	}
 
-	chal := Challenge{
+	chal := api.Challenge{
 		Type:        "standard",
 		Name:        d.Get("name").(string),
 		Category:    d.Get("category").(string),

@@ -3,6 +3,7 @@ package ctfd
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/jedevc/terraform-provider-ctfd/api"
 )
 
 func Provider() terraform.ResourceProvider {
@@ -45,7 +46,7 @@ func providerDataSourcesMap() map[string]*schema.Resource {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	config := Config{
+	config := api.Config{
 		Username: d.Get("username").(string),
 		Password: d.Get("password").(string),
 		URL:      d.Get("url").(string),
@@ -61,4 +62,9 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	return &context, nil
+}
+
+type TerraformCTFdContext struct {
+	client *api.Client
+	config api.Config
 }
