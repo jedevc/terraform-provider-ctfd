@@ -46,63 +46,6 @@ func resourceCTFdChallenge() *schema.Resource {
 				Default:  0,
 				Optional: true,
 			},
-			// "file": &schema.Schema{
-			// 	Type:     schema.TypeSet,
-			// 	Optional: true,
-			// 	Elem: &schema.Resource{
-			// 		Schema: map[string]*schema.Schema{
-			// 			"content": {
-			// 				Type:     schema.TypeString,
-			// 				Required: true,
-			// 			},
-			// 			"filename": {
-			// 				Type:     schema.TypeString,
-			// 				Required: true,
-			// 			},
-			// 		},
-			// 	},
-			// },
-			// "flag": &schema.Schema{
-			// 	Type:     schema.TypeSet,
-			// 	Optional: true,
-			// 	Elem: &schema.Resource{
-			// 		Schema: map[string]*schema.Schema{
-			// 			"pattern": {
-			// 				Type:     schema.TypeString,
-			// 				Required: true,
-			// 			},
-			// 			"regex": {
-			// 				Type:     schema.TypeBool,
-			// 				Default:  false,
-			// 				Optional: true,
-			// 			},
-			// 		},
-			// 	},
-			// },
-			// "hint": &schema.Schema{
-			// 	Type:     schema.TypeSet,
-			// 	Optional: true,
-			// 	Elem: &schema.Resource{
-			// 		Schema: map[string]*schema.Schema{
-			// 			"text": {
-			// 				Type:     schema.TypeString,
-			// 				Required: true,
-			// 			},
-			// 			"cost": {
-			// 				Type:     schema.TypeInt,
-			// 				Default:  0,
-			// 				Optional: true,
-			// 			},
-			// 		},
-			// 	},
-			// },
-			// "requirements": &schema.Schema{
-			// 	Type:     schema.TypeList,
-			// 	Optional: true,
-			// 	Elem: &schema.Schema{
-			// 		Type: schema.TypeInt,
-			// 	},
-			// },
 		},
 	}
 }
