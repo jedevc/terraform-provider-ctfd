@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Flag struct {
@@ -13,119 +12,47 @@ type Flag struct {
 	Options   string `json:"data,omitempty"` // NOTE: should be "" or "case_insensitive"
 }
 
-func (client *Client) ListFlags() ([]Flag, error) {
-	req, err := client.api("GET", nil, "flags")
+func (client *Client) ListFlags() (result []Flag, err error) {
+	data, err := client.apiCall("GET", nil, "flags")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	flagResp := new(flagsResponse)
-	json.NewDecoder(resp.Body).Decode(flagResp)
-	resp.Body.Close()
-	if !flagResp.Success {
-		return nil, fmt.Errorf("could not list challenges (%s)", flagResp.Message)
-	}
-
-	return flagResp.Data, nil
+	err = json.Unmarshal(*data, &result)
+	return
 }
 
-func (client *Client) ListChallengeFlags(chal uint) ([]Flag, error) {
-	req, err := client.api("GET", nil, "challenges", chal, "flags")
+func (client *Client) ListChallengeFlags(chal uint) (result []Flag, err error) {
+	data, err := client.apiCall("GET", nil, "challenges", chal, "flags")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	flagResp := new(flagsResponse)
-	json.NewDecoder(resp.Body).Decode(flagResp)
-	resp.Body.Close()
-	if !flagResp.Success {
-		return nil, fmt.Errorf("could not list challenges (%s)", flagResp.Message)
-	}
-
-	return flagResp.Data, nil
+	err = json.Unmarshal(*data, &result)
+	return
 }
 
-func (client *Client) CreateFlag(flag Flag) (*Flag, error) {
-	req, err := client.api("POST", flag, "flags")
+func (client *Client) CreateFlag(flag Flag) (result *Flag, err error) {
+	data, err := client.apiCall("POST", flag, "flags")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := client.cl.Do(req)
+	err = json.Unmarshal(*data, &result)
+	return
+}
+
+func (client *Client) GetFlag(flag uint) (result *Flag, err error) {
+	data, err := client.apiCall("POST", flag, "flags", flag)
 	if err != nil {
 		return nil, err
 	}
 
-	flagResp := new(flagResponse)
-	json.NewDecoder(resp.Body).Decode(flagResp)
-	resp.Body.Close()
-	if !flagResp.Success {
-		return nil, fmt.Errorf("could not create challenge (%s)", flagResp.Message)
-	}
-
-	return &flagResp.Data, nil
+	err = json.Unmarshal(*data, &result)
+	return
 }
 
-func (client *Client) GetFlag(flag uint) (*Flag, error) {
-	req, err := client.api("POST", flag, "flags", flag)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	flagResp := new(flagResponse)
-	json.NewDecoder(resp.Body).Decode(flagResp)
-	resp.Body.Close()
-	if !flagResp.Success {
-		return nil, fmt.Errorf("could not list challenges (%s)", flagResp.Message)
-	}
-
-	return &flagResp.Data, nil
-}
-
-func (client *Client) DeleteFlag(flag uint) error {
-	req, err := client.api("DELETE", flag, "flags", flag)
-	if err != nil {
-		return err
-	}
-
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return err
-	}
-
-	flagResp := new(flagResponse)
-	json.NewDecoder(resp.Body).Decode(flagResp)
-	resp.Body.Close()
-	if !flagResp.Success {
-		return fmt.Errorf("could not delete challenge (%s)", flagResp.Message)
-	}
-
-	return nil
-}
-
-type flagsResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Data    []Flag `json:"data"`
-}
-
-type flagResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Data    Flag   `json:"data"`
+func (client *Client) DeleteFlag(flag uint) (err error) {
+	_, err = client.apiCall("DELETE", flag, "flags", flag)
+	return
 }

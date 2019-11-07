@@ -15,6 +15,39 @@ type Client struct {
 	nonce string
 }
 
+type APIResult struct {
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *json.RawMessage `json:"data"`
+}
+
+func (client *Client) apiCall(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {
+	// make api call
+	req, err := client.api(method, content, parts...)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.cl.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// decode json
+	result := new(APIResult)
+	err = json.NewDecoder(resp.Body).Decode(result)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse json: %s", err)
+	}
+
+	// work out success
+	if !result.Success {
+		return nil, fmt.Errorf("could not execute api call: %s", result.Message)
+	}
+
+	return result.Data, nil
+}
+
 func (client *Client) api(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
 	// construct api url
 	path := "/api/v1"

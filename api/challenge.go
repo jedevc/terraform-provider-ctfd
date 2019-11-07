@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Challenge struct {
@@ -16,118 +15,47 @@ type Challenge struct {
 	MaxAttempts uint   `json:"max_attempts,omitempty"`
 }
 
-func (client *Client) ListChallenges() ([]Challenge, error) {
-	req, err := client.api("GET", nil, "challenges")
+func (client *Client) ListChallenges() (result []Challenge, err error) {
+	data, err := client.apiCall("GET", nil, "challenges")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	chalResp := new(challengesResponse)
-	json.NewDecoder(resp.Body).Decode(chalResp)
-	resp.Body.Close()
-	if !chalResp.Success {
-		return nil, fmt.Errorf("could not list challenges (%s)", chalResp.Message)
-	}
-
-	return chalResp.Data, nil
+	err = json.Unmarshal(*data, &result)
+	return
 }
 
-func (client *Client) CreateChallenge(chal Challenge) (*Challenge, error) {
-	req, err := client.api("POST", chal, "challenges")
+func (client *Client) CreateChallenge(chal Challenge) (result Challenge, err error) {
+	data, err := client.apiCall("POST", chal, "challenges")
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	chalResp := new(challengeResponse)
-	json.NewDecoder(resp.Body).Decode(chalResp)
-	resp.Body.Close()
-	if !chalResp.Success {
-		return nil, fmt.Errorf("could not create challenge (%s)", chalResp.Message)
-	}
-
-	return &chalResp.Data, nil
+	err = json.Unmarshal(*data, &result)
+	return
 }
 
-func (client *Client) GetChallenge(chal uint) (*Challenge, error) {
-	req, err := client.api("GET", nil, "challenges", chal)
+func (client *Client) GetChallenge(chal uint) (result Challenge, err error) {
+	data, err := client.apiCall("GET", nil, "challenges", chal)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	chalResp := new(challengeResponse)
-	json.NewDecoder(resp.Body).Decode(chalResp)
-	resp.Body.Close()
-	if !chalResp.Success {
-		return nil, fmt.Errorf("could not list challenges (%s)", chalResp.Message)
-	}
-
-	return &chalResp.Data, nil
+	err = json.Unmarshal(*data, &result)
+	return
 }
 
-func (client *Client) ModifyChallenge(chal Challenge) (*Challenge, error) {
-	req, err := client.api("PATCH", chal, "challenges", chal.ID)
+func (client *Client) ModifyChallenge(chal Challenge) (result Challenge, err error) {
+	data, err := client.apiCall("PATCH", chal, "challenges", chal.ID)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	chalResp := new(challengeResponse)
-	json.NewDecoder(resp.Body).Decode(chalResp)
-	resp.Body.Close()
-	if !chalResp.Success {
-		return nil, fmt.Errorf("could not modify challenge (%s)", chalResp.Message)
-	}
-
-	return &chalResp.Data, nil
+	err = json.Unmarshal(*data, &result)
+	return
 }
 
-func (client *Client) DeleteChallenge(chal uint) error {
-	req, err := client.api("DELETE", chal, "challenges", chal)
-	if err != nil {
-		return err
-	}
-
-	resp, err := client.cl.Do(req)
-	if err != nil {
-		return err
-	}
-
-	chalResp := new(challengeResponse)
-	json.NewDecoder(resp.Body).Decode(chalResp)
-	resp.Body.Close()
-	if !chalResp.Success {
-		return fmt.Errorf("could not delete challenge (%s)", chalResp.Message)
-	}
-
-	return nil
-}
-
-type challengesResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message"`
-	Data    []Challenge `json:"data"`
-}
-
-type challengeResponse struct {
-	Success bool      `json:"success"`
-	Message string    `json:"message"`
-	Data    Challenge `json:"data"`
+func (client *Client) DeleteChallenge(chal uint) (err error) {
+	_, err = client.apiCall("DELETE", chal, "challenges", chal)
+	return
 }
