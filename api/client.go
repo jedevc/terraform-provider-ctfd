@@ -15,10 +15,6 @@ type Client struct {
 	nonce string
 }
 
-func (client *Client) endpoint(resource string) string {
-	return client.url + "/" + resource
-}
-
 func (client *Client) api(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
 	// construct api url
 	path := "/api/v1"

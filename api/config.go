@@ -6,6 +6,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"regexp"
+	"strings"
 )
 
 var nonceRegex *regexp.Regexp = regexp.MustCompile("var csrf_nonce = *\"([a-zA-Z0-9]*)\"")
@@ -18,7 +19,7 @@ type Config struct {
 }
 
 func (config Config) Client() (client Client, err error) {
-	client.url = config.URL
+	client.url = strings.TrimRight(config.URL, "/")
 
 	client.cl.Jar, err = cookiejar.New(nil)
 	if err != nil {
@@ -32,7 +33,7 @@ func (config Config) Client() (client Client, err error) {
 	form.Set("name", config.Username)
 	form.Set("password", config.Password)
 	form.Set("nonce", client.nonce)
-	resp, err := client.cl.PostForm(client.endpoint("login"), form)
+	resp, err := client.cl.PostForm(client.url+"/login", form)
 	if err != nil {
 		return
 	}
