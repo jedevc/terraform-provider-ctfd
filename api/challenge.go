@@ -1,10 +1,8 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type Challenge struct {
@@ -19,7 +17,12 @@ type Challenge struct {
 }
 
 func (client *Client) ListChallenges() ([]Challenge, error) {
-	resp, err := client.cl.Get(client.api("challenges"))
+	req, err := client.api("GET", nil, "challenges")
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := client.cl.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -35,21 +38,16 @@ func (client *Client) ListChallenges() ([]Challenge, error) {
 }
 
 func (client *Client) CreateChallenge(chal Challenge) (*Challenge, error) {
-	buff := new(bytes.Buffer)
-	enc := json.NewEncoder(buff)
-	enc.Encode(chal)
-
-	req, err := http.NewRequest("POST", client.api("challenges"), buff)
+	req, err := client.api("POST", chal, "challenges")
 	if err != nil {
 		return nil, err
 	}
-	req.Header["CSRF-Token"] = []string{client.nonce}
-	req.Header["Content-Type"] = []string{"application/json"}
 
 	resp, err := client.cl.Do(req)
 	if err != nil {
 		return nil, err
 	}
+
 	chalResp := new(challengeResponse)
 	json.NewDecoder(resp.Body).Decode(chalResp)
 	resp.Body.Close()
@@ -61,8 +59,12 @@ func (client *Client) CreateChallenge(chal Challenge) (*Challenge, error) {
 }
 
 func (client *Client) GetChallenge(chal uint) (*Challenge, error) {
-	url := client.api(fmt.Sprintf("challenges/%d", chal))
-	resp, err := client.cl.Get(url)
+	req, err := client.api("GET", nil, "challenges", chal)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := client.cl.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -78,17 +80,10 @@ func (client *Client) GetChallenge(chal uint) (*Challenge, error) {
 }
 
 func (client *Client) ModifyChallenge(chal Challenge) (*Challenge, error) {
-	buff := new(bytes.Buffer)
-	enc := json.NewEncoder(buff)
-	enc.Encode(chal)
-
-	url := client.api(fmt.Sprintf("challenges/%d", chal.ID))
-	req, err := http.NewRequest("PATCH", url, buff)
+	req, err := client.api("PATCH", chal, "challenges", chal.ID)
 	if err != nil {
 		return nil, err
 	}
-	req.Header["CSRF-Token"] = []string{client.nonce}
-	req.Header["Content-Type"] = []string{"application/json"}
 
 	resp, err := client.cl.Do(req)
 	if err != nil {
@@ -105,13 +100,10 @@ func (client *Client) ModifyChallenge(chal Challenge) (*Challenge, error) {
 }
 
 func (client *Client) DeleteChallenge(chal uint) error {
-	url := client.api(fmt.Sprintf("challenges/%d", chal))
-	req, err := http.NewRequest("DELETE", url, nil)
+	req, err := client.api("DELETE", chal, "challenges", chal)
 	if err != nil {
 		return err
 	}
-	req.Header["CSRF-Token"] = []string{client.nonce}
-	req.Header["Content-Type"] = []string{"application/json"}
 
 	resp, err := client.cl.Do(req)
 	if err != nil {
