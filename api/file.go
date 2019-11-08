@@ -6,11 +6,16 @@ import (
 )
 
 type File struct {
-	ID        uint     `json:"id,omitempty" multipart:"-"`
+	Type string `json:"type" multipart:"type"`
+
+	// outputs
+	ID       uint   `json:"id,omitempty" multipart:"-"`
+	Location string `json:"location"`
+
+	// inputs
 	Challenge uint     `json:"-" multipart:"challenge"`
-	Type      string   `json:"type" multipart:"type"`
-	Location  string   `json:"location,omitempty" multipart:"-"`
 	File      *os.File `json:"-" multipart:"file"`
+	Hash      string   `json:"-" multipart:"-"`
 }
 
 func (client *Client) ListFiles() (result []File, err error) {

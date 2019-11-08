@@ -39,6 +39,7 @@ func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
 		"ctfd_challenge": resourceCTFdChallenge(),
 		"ctfd_flag":      resourceCTFdFlag(),
+		"ctfd_file":      resourceCTFdFile(),
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"path/filepath"
 	"reflect"
 )
 
@@ -30,7 +31,7 @@ func MultipartMarshal(writer *multipart.Writer, content interface{}) error {
 		file, ok := value.(*os.File)
 		if ok {
 			// create form field
-			field, err := writer.CreateFormFile(name, file.Name())
+			field, err := writer.CreateFormFile(name, filepath.Base(file.Name()))
 			if err != nil {
 				return err
 			}
