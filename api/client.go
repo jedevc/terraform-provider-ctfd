@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+
+	"github.com/jedevc/terraform-provider-ctfd/utils"
 )
 
 type Client struct {
@@ -23,7 +26,7 @@ type APIResult struct {
 
 func (client *Client) apiCall(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {
 	// make api call
-	req, err := client.api(method, content, parts...)
+	req, err := client.apiRequest(method, content, parts...)
 	if err != nil {
 		return nil, err
 	}
@@ -33,29 +36,29 @@ func (client *Client) apiCall(method string, content interface{}, parts ...inter
 	}
 	defer resp.Body.Close()
 
-	// decode json
-	result := new(APIResult)
-	err = json.NewDecoder(resp.Body).Decode(result)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse json: %s", err)
-	}
-
-	// work out success
-	if !result.Success {
-		return nil, fmt.Errorf("could not execute api call: %s", result.Message)
-	}
-
-	return result.Data, nil
+	// extract
+	return client.apiExtract(resp.Body)
 }
 
-func (client *Client) api(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
-	// construct api url
-	path := "/api/v1"
-	for _, part := range parts {
-		segment := fmt.Sprintf("%v", part)
-		// segment := strings.Trim(segment, "/")
-		path += "/" + segment
+func (client *Client) apiCallMultipart(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {
+	// make api call
+	req, err := client.apiMultipartRequest(method, content, parts...)
+	if err != nil {
+		return nil, err
 	}
+	resp, err := client.cl.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// extract
+	return client.apiExtract(resp.Body)
+}
+
+func (client *Client) apiRequest(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
+	// construct api url
+	path := client.apiBase(parts...)
 
 	// convert content to string
 	var buff io.ReadWriter
@@ -72,7 +75,7 @@ func (client *Client) api(method string, content interface{}, parts ...interface
 	}
 
 	// create request
-	req, err := http.NewRequest(method, client.url+path, buff)
+	req, err := http.NewRequest(method, path, buff)
 	if err != nil {
 		return nil, err
 	}
@@ -82,6 +85,67 @@ func (client *Client) api(method string, content interface{}, parts ...interface
 	req.Header["Content-Type"] = []string{"application/json"}
 
 	return req, nil
+}
+
+func (client *Client) apiMultipartRequest(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
+	// construct api url
+	path := client.apiBase(parts...)
+
+	// create multipart body
+	var body io.ReadWriter = &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	// extract into multipart
+	utils.MultipartMarshal(writer, content)
+
+	// write the nonce value
+	err := writer.WriteField("nonce", client.nonce)
+	if err != nil {
+		return nil, err
+	}
+
+	// close the multipart writer
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	// create the request
+	req, err := http.NewRequest(method, path, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	return req, err
+}
+
+func (client *Client) apiExtract(body io.Reader) (*json.RawMessage, error) {
+	// decode json
+	result := new(APIResult)
+	err := json.NewDecoder(body).Decode(result)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse json: %s", err)
+	}
+
+	// work out success
+	if !result.Success {
+		return nil, fmt.Errorf("could not execute api call: %s", result.Message)
+	}
+
+	return result.Data, nil
+}
+
+func (client *Client) apiBase(parts ...interface{}) string {
+	// construct api url
+	path := "/api/v1"
+	for _, part := range parts {
+		segment := fmt.Sprintf("%v", part)
+		// segment := strings.Trim(segment, "/")
+		path += "/" + segment
+	}
+
+	return client.url + path
 }
 
 func (client *Client) extractNonce() error {
