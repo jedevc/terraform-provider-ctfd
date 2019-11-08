@@ -24,9 +24,9 @@ type APIResult struct {
 	Data    *json.RawMessage `json:"data"`
 }
 
-func (client *Client) apiCall(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {
+func (client *Client) rest(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {
 	// make api call
-	req, err := client.apiRequest(method, content, parts...)
+	req, err := client.restRequest(method, content, parts...)
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +40,9 @@ func (client *Client) apiCall(method string, content interface{}, parts ...inter
 	return client.apiExtract(resp.Body)
 }
 
-func (client *Client) apiCallMultipart(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {
+func (client *Client) multipart(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {
 	// make api call
-	req, err := client.apiMultipartRequest(method, content, parts...)
+	req, err := client.multipartRequest(method, content, parts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (client *Client) apiCallMultipart(method string, content interface{}, parts
 	return client.apiExtract(resp.Body)
 }
 
-func (client *Client) apiRequest(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
+func (client *Client) restRequest(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
 	// construct api url
 	path := client.apiBase(parts...)
 
@@ -87,7 +87,7 @@ func (client *Client) apiRequest(method string, content interface{}, parts ...in
 	return req, nil
 }
 
-func (client *Client) apiMultipartRequest(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
+func (client *Client) multipartRequest(method string, content interface{}, parts ...interface{}) (*http.Request, error) {
 	// construct api url
 	path := client.apiBase(parts...)
 

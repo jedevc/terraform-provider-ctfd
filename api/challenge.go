@@ -16,7 +16,7 @@ type Challenge struct {
 }
 
 func (client *Client) ListChallenges() (result []Challenge, err error) {
-	data, err := client.apiCall("GET", nil, "challenges")
+	data, err := client.rest("GET", nil, "challenges")
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (client *Client) ListChallenges() (result []Challenge, err error) {
 }
 
 func (client *Client) CreateChallenge(chal Challenge) (result Challenge, err error) {
-	data, err := client.apiCall("POST", chal, "challenges")
+	data, err := client.rest("POST", chal, "challenges")
 	if err != nil {
 		return
 	}
@@ -36,7 +36,7 @@ func (client *Client) CreateChallenge(chal Challenge) (result Challenge, err err
 }
 
 func (client *Client) GetChallenge(chal uint) (result Challenge, err error) {
-	data, err := client.apiCall("GET", nil, "challenges", chal)
+	data, err := client.rest("GET", nil, "challenges", chal)
 	if err != nil {
 		return
 	}
@@ -46,7 +46,7 @@ func (client *Client) GetChallenge(chal uint) (result Challenge, err error) {
 }
 
 func (client *Client) ModifyChallenge(chal Challenge) (result Challenge, err error) {
-	data, err := client.apiCall("PATCH", chal, "challenges", chal.ID)
+	data, err := client.rest("PATCH", chal, "challenges", chal.ID)
 	if err != nil {
 		return
 	}
@@ -56,6 +56,6 @@ func (client *Client) ModifyChallenge(chal Challenge) (result Challenge, err err
 }
 
 func (client *Client) DeleteChallenge(chal uint) (err error) {
-	_, err = client.apiCall("DELETE", nil, "challenges", chal)
+	_, err = client.rest("DELETE", nil, "challenges", chal)
 	return
 }
