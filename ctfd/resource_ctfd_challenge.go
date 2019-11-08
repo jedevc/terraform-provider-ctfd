@@ -70,13 +70,13 @@ func resourceCTFdChallengeCreate(d *schema.ResourceData, meta interface{}) error
 		State:       state,
 		MaxAttempts: uint(d.Get("max_attempts").(int)),
 	}
-	challenge, err := client.CreateChallenge(chal)
+	chal, err := client.CreateChallenge(chal)
 	if err != nil {
 		return err
 	}
 
-	d.Set("challenge_id", challenge.ID)
-	d.SetId(strconv.FormatUint(uint64(challenge.ID), 10))
+	d.Set("challenge_id", chal.ID)
+	d.SetId(strconv.Itoa(d.Get("challenge_id").(int)))
 	return nil
 }
 

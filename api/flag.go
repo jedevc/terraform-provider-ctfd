@@ -15,7 +15,7 @@ type Flag struct {
 func (client *Client) ListFlags() (result []Flag, err error) {
 	data, err := client.apiCall("GET", nil, "flags")
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	err = json.Unmarshal(*data, &result)
@@ -25,27 +25,37 @@ func (client *Client) ListFlags() (result []Flag, err error) {
 func (client *Client) ListChallengeFlags(chal uint) (result []Flag, err error) {
 	data, err := client.apiCall("GET", nil, "challenges", chal, "flags")
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	err = json.Unmarshal(*data, &result)
 	return
 }
 
-func (client *Client) CreateFlag(flag Flag) (result *Flag, err error) {
+func (client *Client) CreateFlag(flag Flag) (result Flag, err error) {
 	data, err := client.apiCall("POST", flag, "flags")
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	err = json.Unmarshal(*data, &result)
 	return
 }
 
-func (client *Client) GetFlag(flag uint) (result *Flag, err error) {
-	data, err := client.apiCall("POST", flag, "flags", flag)
+func (client *Client) GetFlag(flag uint) (result Flag, err error) {
+	data, err := client.apiCall("GET", flag, "flags", flag)
 	if err != nil {
-		return nil, err
+		return
+	}
+
+	err = json.Unmarshal(*data, &result)
+	return
+}
+
+func (client *Client) ModifyFlag(flag Flag) (result Flag, err error) {
+	data, err := client.apiCall("PATCH", flag, "flags", flag.ID)
+	if err != nil {
+		return
 	}
 
 	err = json.Unmarshal(*data, &result)
