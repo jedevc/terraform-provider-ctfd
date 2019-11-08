@@ -56,6 +56,6 @@ func (client *Client) ModifyChallenge(chal Challenge) (result Challenge, err err
 }
 
 func (client *Client) DeleteChallenge(chal uint) (err error) {
-	_, err = client.apiCall("DELETE", chal, "challenges", chal)
+	_, err = client.apiCall("DELETE", nil, "challenges", chal)
 	return
 }

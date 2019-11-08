@@ -43,7 +43,7 @@ func (client *Client) CreateFlag(flag Flag) (result Flag, err error) {
 }
 
 func (client *Client) GetFlag(flag uint) (result Flag, err error) {
-	data, err := client.apiCall("GET", flag, "flags", flag)
+	data, err := client.apiCall("GET", nil, "flags", flag)
 	if err != nil {
 		return
 	}
@@ -63,6 +63,6 @@ func (client *Client) ModifyFlag(flag Flag) (result Flag, err error) {
 }
 
 func (client *Client) DeleteFlag(flag uint) (err error) {
-	_, err = client.apiCall("DELETE", flag, "flags", flag)
+	_, err = client.apiCall("DELETE", nil, "flags", flag)
 	return
 }
