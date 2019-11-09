@@ -16,6 +16,11 @@ type Challenge struct {
 }
 
 func (client *Client) ListChallenges() (result []Challenge, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "challenges")
 	if err != nil {
 		return nil, err
@@ -26,6 +31,11 @@ func (client *Client) ListChallenges() (result []Challenge, err error) {
 }
 
 func (client *Client) CreateChallenge(chal Challenge) (result Challenge, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("POST", chal, "challenges")
 	if err != nil {
 		return
@@ -36,6 +46,11 @@ func (client *Client) CreateChallenge(chal Challenge) (result Challenge, err err
 }
 
 func (client *Client) GetChallenge(chal uint) (result Challenge, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "challenges", chal)
 	if err != nil {
 		return
@@ -46,6 +61,11 @@ func (client *Client) GetChallenge(chal uint) (result Challenge, err error) {
 }
 
 func (client *Client) ModifyChallenge(chal Challenge) (result Challenge, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("PATCH", chal, "challenges", chal.ID)
 	if err != nil {
 		return
@@ -56,6 +76,11 @@ func (client *Client) ModifyChallenge(chal Challenge) (result Challenge, err err
 }
 
 func (client *Client) DeleteChallenge(chal uint) (err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	_, err = client.rest("DELETE", nil, "challenges", chal)
 	return
 }

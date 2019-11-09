@@ -46,8 +46,7 @@ func resourceCTFdFile() *schema.Resource {
 }
 
 func resourceCTFdFileCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	fd, err := os.Open(d.Get("filename").(string))
 	if err != nil {
@@ -67,7 +66,7 @@ func resourceCTFdFileCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 	file := files[0]
 
-	d.Set("location", config.URL+"/files/"+file.Location)
+	d.Set("location", client.Config.URL+"/files/"+file.Location)
 	d.Set("file_id", file.ID)
 
 	d.SetId(strconv.Itoa(d.Get("file_id").(int)))
@@ -75,8 +74,7 @@ func resourceCTFdFileCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCTFdFileRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	fileID := uint(d.Get("file_id").(int))
 	file, err := client.GetFile(fileID)
@@ -84,14 +82,13 @@ func resourceCTFdFileRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.Set("location", config.URL+"/files/"+file.Location)
+	d.Set("location", client.Config.URL+"/files/"+file.Location)
 
 	return nil
 }
 
 func resourceCTFdFileDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	fileID := uint(d.Get("file_id").(int))
 	err := client.DeleteFile(fileID)

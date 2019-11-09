@@ -18,6 +18,11 @@ type File struct {
 }
 
 func (client *Client) ListFiles() (result []File, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "files?type=challenge")
 	if err != nil {
 		return
@@ -28,6 +33,11 @@ func (client *Client) ListFiles() (result []File, err error) {
 }
 
 func (client *Client) ListChallengeFiles(chal uint) (result []File, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "challenges", chal, "files")
 	if err != nil {
 		return
@@ -38,6 +48,11 @@ func (client *Client) ListChallengeFiles(chal uint) (result []File, err error) {
 }
 
 func (client *Client) CreateFile(file FileSpec) (result []File, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.multipart("POST", file, "files")
 	if err != nil {
 		return
@@ -48,6 +63,11 @@ func (client *Client) CreateFile(file FileSpec) (result []File, err error) {
 }
 
 func (client *Client) GetFile(file uint) (result File, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "files", file)
 	if err != nil {
 		return
@@ -58,6 +78,11 @@ func (client *Client) GetFile(file uint) (result File, err error) {
 }
 
 func (client *Client) DeleteFile(file uint) (err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	_, err = client.rest("DELETE", nil, "files", file)
 	return
 }

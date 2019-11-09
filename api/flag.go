@@ -13,6 +13,11 @@ type Flag struct {
 }
 
 func (client *Client) ListFlags() (result []Flag, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "flags")
 	if err != nil {
 		return
@@ -23,6 +28,11 @@ func (client *Client) ListFlags() (result []Flag, err error) {
 }
 
 func (client *Client) ListChallengeFlags(chal uint) (result []Flag, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "challenges", chal, "flags")
 	if err != nil {
 		return
@@ -33,6 +43,11 @@ func (client *Client) ListChallengeFlags(chal uint) (result []Flag, err error) {
 }
 
 func (client *Client) CreateFlag(flag Flag) (result Flag, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("POST", flag, "flags")
 	if err != nil {
 		return
@@ -43,6 +58,11 @@ func (client *Client) CreateFlag(flag Flag) (result Flag, err error) {
 }
 
 func (client *Client) GetFlag(flag uint) (result Flag, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("GET", nil, "flags", flag)
 	if err != nil {
 		return
@@ -53,6 +73,11 @@ func (client *Client) GetFlag(flag uint) (result Flag, err error) {
 }
 
 func (client *Client) ModifyFlag(flag Flag) (result Flag, err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	data, err := client.rest("PATCH", flag, "flags", flag.ID)
 	if err != nil {
 		return
@@ -63,6 +88,11 @@ func (client *Client) ModifyFlag(flag Flag) (result Flag, err error) {
 }
 
 func (client *Client) DeleteFlag(flag uint) (err error) {
+	err = client.Init()
+	if err != nil {
+		return
+	}
+
 	_, err = client.rest("DELETE", nil, "flags", flag)
 	return
 }

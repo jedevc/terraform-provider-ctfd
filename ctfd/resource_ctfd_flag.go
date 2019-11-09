@@ -38,8 +38,7 @@ func resourceCTFdFlag() *schema.Resource {
 }
 
 func resourceCTFdFlagCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	var flagType string
 	if d.Get("regex").(bool) {
@@ -64,8 +63,7 @@ func resourceCTFdFlagCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCTFdFlagRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	flagID := uint(d.Get("flag_id").(int))
 	flag, err := client.GetFlag(flagID)
@@ -81,8 +79,7 @@ func resourceCTFdFlagRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCTFdFlagUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	var flagType string
 	if d.Get("regex").(bool) {
@@ -102,8 +99,7 @@ func resourceCTFdFlagUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCTFdFlagDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	flagID := uint(d.Get("flag_id").(int))
 

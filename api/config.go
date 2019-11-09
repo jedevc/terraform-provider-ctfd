@@ -16,22 +16,11 @@ type Config struct {
 }
 
 func (config Config) Client() (client Client, err error) {
+	client.Config = config
+
 	client.url = strings.TrimRight(config.URL, "/")
 
 	client.cl.Jar, err = cookiejar.New(nil)
-	if err != nil {
-		return
-	}
-
-	err = client.extractNonce()
-	if err != nil {
-		return
-	}
-	err = client.login(config.Username, config.Password)
-	if err != nil {
-		return
-	}
-	err = client.extractNonce()
 	if err != nil {
 		return
 	}

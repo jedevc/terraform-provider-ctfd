@@ -14,15 +14,40 @@ import (
 )
 
 type Client struct {
-	cl    http.Client
-	url   string
-	nonce string
+	Config Config
+	active bool
+	cl     http.Client
+	url    string
+	nonce  string
 }
 
 type APIResult struct {
 	Success bool             `json:"success"`
 	Message string           `json:"message"`
 	Data    *json.RawMessage `json:"data"`
+}
+
+func (client *Client) Init() (err error) {
+	if client.active {
+		return nil
+	} else {
+		client.active = true
+	}
+
+	err = client.extractNonce()
+	if err != nil {
+		return
+	}
+	err = client.login(client.Config.Username, client.Config.Password)
+	if err != nil {
+		return
+	}
+	err = client.extractNonce()
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func (client *Client) rest(method string, content interface{}, parts ...interface{}) (*json.RawMessage, error) {

@@ -51,8 +51,7 @@ func resourceCTFdChallenge() *schema.Resource {
 }
 
 func resourceCTFdChallengeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	var state string
 	if d.Get("hidden").(bool) {
@@ -81,8 +80,7 @@ func resourceCTFdChallengeCreate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceCTFdChallengeRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	challengeID := uint(d.Get("challenge_id").(int))
 	chal, err := client.GetChallenge(challengeID)
@@ -101,8 +99,7 @@ func resourceCTFdChallengeRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCTFdChallengeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	var state string
 	if d.Get("hidden").(bool) {
@@ -126,8 +123,7 @@ func resourceCTFdChallengeUpdate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceCTFdChallengeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*TerraformCTFdContext).client
-	// config := meta.(*TerraformCTFdContext).config
+	client := meta.(*api.Client)
 
 	challengeID := uint(d.Get("challenge_id").(int))
 

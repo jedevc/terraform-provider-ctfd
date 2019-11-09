@@ -58,15 +58,5 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		return nil, err
 	}
 
-	context := TerraformCTFdContext{
-		client: &client,
-		config: config,
-	}
-
-	return &context, nil
-}
-
-type TerraformCTFdContext struct {
-	client *api.Client
-	config api.Config
+	return &client, nil
 }
