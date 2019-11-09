@@ -56,16 +56,16 @@ func resourceCTFdFileCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer fd.Close()
 
-	file := api.File{
+	spec := api.FileSpec{
 		Challenge: uint(d.Get("challenge").(int)),
 		Type:      "challenge",
 		File:      fd,
 	}
-	files, err := client.CreateFile(file)
+	files, err := client.CreateFile(spec)
 	if err != nil {
 		return err
 	}
-	file = files[0]
+	file := files[0]
 
 	d.Set("location", config.URL+"/files/"+file.Location)
 	d.Set("file_id", file.ID)

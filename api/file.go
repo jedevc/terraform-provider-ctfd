@@ -5,17 +5,16 @@ import (
 	"os"
 )
 
+type FileSpec struct {
+	Type      string   `multipart:"type"`
+	Challenge uint     `multipart:"challenge"`
+	File      *os.File `multipart:"file"`
+}
+
 type File struct {
-	Type string `json:"type" multipart:"type"`
-
-	// outputs
-	ID       uint   `json:"id,omitempty" multipart:"-"`
+	ID       uint   `json:"id,omitempty"`
+	Type     string `json:"type"`
 	Location string `json:"location"`
-
-	// inputs
-	Challenge uint     `json:"-" multipart:"challenge"`
-	File      *os.File `json:"-" multipart:"file"`
-	Hash      string   `json:"-" multipart:"-"`
 }
 
 func (client *Client) ListFiles() (result []File, err error) {
@@ -38,7 +37,7 @@ func (client *Client) ListChallengeFiles(chal uint) (result []File, err error) {
 	return
 }
 
-func (client *Client) CreateFile(file File) (result []File, err error) {
+func (client *Client) CreateFile(file FileSpec) (result []File, err error) {
 	data, err := client.multipart("POST", file, "files")
 	if err != nil {
 		return
