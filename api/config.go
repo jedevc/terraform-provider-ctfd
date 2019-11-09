@@ -1,10 +1,7 @@
 package api
 
 import (
-	"fmt"
-	"io/ioutil"
 	"net/http/cookiejar"
-	"net/url"
 	"regexp"
 	"strings"
 )
@@ -26,28 +23,18 @@ func (config Config) Client() (client Client, err error) {
 		return
 	}
 
-	client.extractNonce()
-
-	// login
-	form := url.Values{}
-	form.Set("name", config.Username)
-	form.Set("password", config.Password)
-	form.Set("nonce", client.nonce)
-	resp, err := client.cl.PostForm(client.url+"/login", form)
+	err = client.extractNonce()
 	if err != nil {
 		return
 	}
-	body, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+	err = client.login(config.Username, config.Password)
 	if err != nil {
 		return
 	}
-	if loginRegex.Match(body) {
-		err = fmt.Errorf("Could not login: invalid credentials")
+	err = client.extractNonce()
+	if err != nil {
 		return
 	}
-
-	client.extractNonce()
 
 	return
 }

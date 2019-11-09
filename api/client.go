@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 
 	"github.com/jedevc/terraform-provider-ctfd/utils"
 )
@@ -161,6 +162,30 @@ func (client *Client) extractNonce() error {
 	parts := nonceRegex.FindSubmatch(body)
 	nonce := parts[1]
 	client.nonce = string(nonce)
+
+	return nil
+}
+
+func (client *Client) login(username string, password string) error {
+	form := url.Values{}
+	form.Set("name", username)
+	form.Set("password", password)
+	form.Set("nonce", client.nonce)
+
+	resp, err := client.cl.PostForm(client.url+"/login", form)
+	if err != nil {
+		return err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	if loginRegex.Match(body) {
+		err = fmt.Errorf("Could not login: invalid credentials")
+		return err
+	}
 
 	return nil
 }
