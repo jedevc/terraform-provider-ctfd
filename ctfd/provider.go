@@ -53,10 +53,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Password: d.Get("password").(string),
 		URL:      d.Get("url").(string),
 	}
-	client, err := config.Client()
-	if err != nil {
-		return nil, err
-	}
+	client := config.Client()
 
 	return &client, nil
 }

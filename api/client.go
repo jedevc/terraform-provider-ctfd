@@ -8,7 +8,10 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
+	"strings"
+	"time"
 
 	"github.com/jedevc/terraform-provider-ctfd/utils"
 )
@@ -16,7 +19,7 @@ import (
 type Client struct {
 	Config Config
 	active bool
-	cl     http.Client
+	cl     *http.Client
 	url    string
 	nonce  string
 }
@@ -32,6 +35,17 @@ func (client *Client) Init() (err error) {
 		return nil
 	} else {
 		client.active = true
+	}
+
+	client.url = strings.TrimRight(client.Config.URL, "/")
+
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		return
+	}
+	client.cl = &http.Client{
+		Timeout: time.Second * 10,
+		Jar:     jar,
 	}
 
 	err = client.extractNonce()
